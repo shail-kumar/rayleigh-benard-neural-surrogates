@@ -1,0 +1,32 @@
+# Generated trajectories - regenerate with rbcs-simulate
+/data/*
+!/data/.gitkeep
+
+# Derived results, except figures
+/results/*.h5
+/results/*.pkl
+/results/*.mp4
+/results/*.pt
+
+# Local-only scratch
+/local/
+/checklist
+
+# Working notes
+/PLAN.md
+/implementation_notes.md
+/implementation_details.md
+
+# Python
+/venv/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+
+# OS / editor
+.DS_Store
+.vscode/
+*.swp
+.ipynb_checkpoints/

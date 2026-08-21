@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rbcs"
+dynamic = ["version"]
+description = "Neural surrogates for 2D Rayleigh-Benard convection: Fourier Neural Operator versus reservoir computing"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Shailendra K. Rathor" }]
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "h5py",
+    "torch",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff==0.16.3"]
+
+[project.scripts]
+rbcs-simulate = "rbcs.experiments.simulate:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "rbcs.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
