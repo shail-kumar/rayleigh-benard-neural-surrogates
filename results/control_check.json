@@ -1,0 +1,53 @@
+{
+ "base": 13.418519225766005,
+ "runs": [
+  {
+   "filtered": false,
+   "budget": 0.005,
+   "surrogate": 14.58263874053955,
+   "solver": 13.219194398320132
+  },
+  {
+   "filtered": false,
+   "budget": 0.01,
+   "surrogate": 15.230250358581543,
+   "solver": 13.018609800176069
+  },
+  {
+   "filtered": false,
+   "budget": 0.02,
+   "surrogate": 16.5406494140625,
+   "solver": 12.618448775175272
+  },
+  {
+   "filtered": false,
+   "budget": 0.05,
+   "surrogate": 20.609086990356445,
+   "solver": 11.510574737164962
+  },
+  {
+   "filtered": true,
+   "budget": 0.005,
+   "surrogate": 13.308549880981445,
+   "solver": 13.216221280118157
+  },
+  {
+   "filtered": true,
+   "budget": 0.01,
+   "surrogate": 13.530929565429688,
+   "solver": 13.017454015568974
+  },
+  {
+   "filtered": true,
+   "budget": 0.02,
+   "surrogate": 13.974852561950684,
+   "solver": 12.628260242432482
+  },
+  {
+   "filtered": true,
+   "budget": 0.05,
+   "surrogate": 15.3235445022583,
+   "solver": 11.539250006813088
+  }
+ ]
+}

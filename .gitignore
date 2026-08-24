@@ -2,11 +2,15 @@
 /data/*
 !/data/.gitkeep
 
-# Derived results, except figures
+# Derived results. Figures, metrics and comparison JSON stay tracked: they
+# back the numbers in WRITEUP.md.
 /results/*.h5
 /results/*.pkl
 /results/*.mp4
 /results/*.pt
+/results/*.npy
+/results/*.npz
+/results/*.log
 
 # Local-only scratch
 /local/
@@ -30,3 +34,14 @@ dist/
 .vscode/
 *.swp
 .ipynb_checkpoints/
+
+# Local run wrapper (systemd-specific)
+/run_guarded.sh
+/wait_then_evaluate.sh
+/_control_check.py
+
+# Accidental duplicates
+*(Copy)*
+
+# Kept local for now
+/social_media/

@@ -1,0 +1,19 @@
+{
+  "pod_floor_val": 0.005430000834167004,
+  "pod_floor_test": 0.009346005506813526,
+  "args": {
+    "rank": 512,
+    "shifts": 8,
+    "reservoir": 800,
+    "spectral_radius": 0.95,
+    "leak": 0.3,
+    "alpha": 1.0,
+    "stride": 6,
+    "train_shifts": 16,
+    "seed": 0
+  },
+  "rc_val": 0.014134968645831377,
+  "rc_test": 0.01821360284473101,
+  "persistence_val": 0.025428498163819313,
+  "persistence_test": 0.026780033484101295
+}

@@ -24,6 +24,29 @@ def default_workers(n_jobs):
     return max(1, min(n_jobs, os.cpu_count() or 1))
 
 
+def dataset_name(ra=None, batch=1):
+    """Dataset filename, labelled by Rayleigh number and batch."""
+    ra = config.RA if ra is None else ra
+    exp = f"{ra:.0e}" if float(f"{ra:.0e}") == ra else f"{ra:.1e}"
+    exp = exp.replace("e+0", "e").replace("e+", "e")
+    suffix = "" if batch == 1 else f"_b{batch}"
+    return f"trajectories_Ra{exp}{suffix}.h5"
+
+
+def find_datasets(ra=None, data_dir=None):
+    """All batches for one Rayleigh number, in batch order."""
+    from rbcs.paths import DATA_DIR
+
+    d = Path(data_dir or DATA_DIR)
+    stem = dataset_name(ra).removesuffix(".h5")
+    return sorted(d.glob(f"{stem}*.h5"), key=lambda p: len(p.name))
+
+
+def batch_seeds(batch, n):
+    """Seeds for a batch, so batches never overlap."""
+    return list(range((batch - 1) * n, batch * n))
+
+
 def simulate(seed, n_snapshots=None, sample_interval=None, spinup=None, progress=None):
     """Run one trajectory past its transient and return (fields, nusselt)."""
     n_snapshots = n_snapshots or config.N_SNAPSHOTS
@@ -106,10 +129,27 @@ def write_dataset(path, seeds, workers=None, **kwargs):
     return path
 
 
-def load_dataset(path):
-    """Return (fields, nusselt, attrs) with fields read fully into memory."""
-    with h5py.File(path, "r") as f:
-        return f["fields"][...], f["nusselt"][...], dict(f.attrs)
+def load_dataset(paths):
+    """Return (fields, nusselt, attrs), concatenating batches along trajectory.
+
+    Raises if batches disagree on the physics or the grid.
+    """
+    paths = [paths] if isinstance(paths, (str, Path)) else list(paths)
+    fields, nusselt, seeds, attrs = [], [], [], None
+    for p in paths:
+        with h5py.File(p, "r") as f:
+            a = dict(f.attrs)
+            if attrs is None:
+                attrs = a
+            else:
+                for k in ("ra", "pr", "nx", "nz", "aspect", "dt", "sample_interval"):
+                    if a[k] != attrs[k]:
+                        raise ValueError(f"{Path(p).name} has {k}={a[k]}, expected {attrs[k]}")
+            seeds.extend(np.atleast_1d(a["seeds"]).tolist())
+            fields.append(f["fields"][...])
+            nusselt.append(f["nusselt"][...])
+    attrs["seeds"] = seeds
+    return np.concatenate(fields), np.concatenate(nusselt), attrs
 
 
 def split_by_trajectory(n_traj, n_val=1, n_test=1):

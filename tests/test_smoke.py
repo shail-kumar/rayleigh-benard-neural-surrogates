@@ -6,15 +6,15 @@ Tests touching generated trajectories skip when data/ is empty (see README).
 import numpy as np
 import pytest
 
-from rbcs.data import CHANNELS, split_by_trajectory
+from rbcs.data import CHANNELS, dataset_name, find_datasets, split_by_trajectory
 from rbcs.paths import DATA_DIR
 from rbcs.solver import RayleighBenard
 
-TRAJECTORIES = DATA_DIR / "trajectories.h5"
+TRAJECTORIES = DATA_DIR / dataset_name()
 
 requires_data = pytest.mark.skipif(
     not TRAJECTORIES.is_file(),
-    reason="trajectories not generated - run rbcs-simulate",
+    reason=f"{TRAJECTORIES.name} not generated - run rbcs-simulate",
 )
 
 
@@ -107,7 +107,7 @@ def test_split_rejects_too_few_trajectories():
 def test_dataset_shape_and_metadata():
     from rbcs.data import load_dataset
 
-    fields, nusselt, attrs = load_dataset(TRAJECTORIES)
+    fields, nusselt, attrs = load_dataset(find_datasets())
     assert fields.ndim == 5
     assert fields.shape[2] == len(CHANNELS)
     assert fields.shape[:2] == nusselt.shape
@@ -119,16 +119,57 @@ def test_dataset_shape_and_metadata():
 def test_generated_trajectories_are_convecting():
     from rbcs.data import load_dataset
 
-    _, nusselt, _ = load_dataset(TRAJECTORIES)
-    # Published 2D no-slip values at Ra=1e6, Pr=1 sit around 8.
-    assert 5.0 < nusselt.mean() < 12.0
+    _, nusselt, attrs = load_dataset(find_datasets())
+    # Nu ~ 0.16 Ra^0.28 for 2D no-slip: 7.7 at Ra=1e6, 14.6 at Ra=1e7.
+    expected = 0.16 * float(attrs["ra"]) ** 0.28
+    assert 0.5 * expected < nusselt.mean() < 2.0 * expected
 
 
 @requires_data
 def test_generated_trajectories_respect_the_walls():
     from rbcs.data import load_dataset
 
-    fields, _, _ = load_dataset(TRAJECTORIES)
+    fields, _, _ = load_dataset(find_datasets())
     theta = fields[:, :, 0]
     assert np.abs(theta[..., 0]).max() == 0.0
     assert np.abs(theta[..., -1]).max() == 0.0
+
+
+def _stack(s):
+    return np.stack([s.theta, s.omega])
+
+
+def _set(s, f):
+    s.theta, s.omega = f[0].copy(), f[1].copy()
+    return s
+
+
+def _seeded(seed=1):
+    return RayleighBenard(ra=1e6, pr=1.0, nx=32, nz=17, aspect=2.0, dt=2.5e-3, seed=seed)
+
+
+def test_x_translation_is_a_symmetry_of_the_solver():
+    """Shifting in x then stepping equals stepping then shifting.
+
+    This is what makes circular-shift augmentation exact rather than a trick.
+    """
+    a = _seeded()
+    for _ in range(3):
+        a.step()
+    s = _set(_seeded(), np.roll(_stack(_seeded()), 7, axis=-2))
+    for _ in range(3):
+        s.step()
+    np.testing.assert_allclose(_stack(s), np.roll(_stack(a), 7, axis=-2), atol=1e-10)
+
+
+def test_x_reflection_is_a_symmetry_of_the_solver():
+    """Mirroring x and negating vorticity commutes with time stepping."""
+    from rbcs.dataset import reflect_x
+
+    a = _seeded()
+    for _ in range(3):
+        a.step()
+    s = _set(_seeded(), reflect_x(_stack(_seeded())))
+    for _ in range(3):
+        s.step()
+    np.testing.assert_allclose(_stack(s), reflect_x(_stack(a)), atol=1e-10)
