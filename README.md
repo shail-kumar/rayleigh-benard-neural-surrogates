@@ -8,6 +8,12 @@ reservoir computing on a POD basis and a persistence baseline, on 2D
 Rayleigh-Bénard convection at Ra = 1e7. The three are compared on field error, on
 heat transport, and on the energy spectrum band by band.
 
+![Solver, FNO and reservoir computing compared side by side](docs/three_way.gif)
+
+Solver, FNO and reservoir computing advancing from the same initial state. The
+clocks are cumulative single-threaded compute; the Nusselt panel is the heat
+transport each one produces.
+
 ## Results
 
 Single-step prediction on held-out trajectories:
