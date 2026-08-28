@@ -1,5 +1,7 @@
 # Neural surrogates for Rayleigh-Bénard convection
 
+[![CI](https://github.com/shail-kumar/rayleigh-benard-neural-surrogates/actions/workflows/ci.yml/badge.svg)](https://github.com/shail-kumar/rayleigh-benard-neural-surrogates/actions/workflows/ci.yml)
+
 Neural operators can stand in for a fluid solver. This project asks what is lost
 when they do, and whether the usual error metrics would show it.
 
@@ -63,12 +65,13 @@ second-order finite differences in z, SSP-RK3 in time.
 | Prandtl number | 1 |
 | Grid | 384 x 128, aspect ratio 4 |
 | Measured Nusselt number | 14.10 +- 2.43 |
-| Published, 2D no-slip | ~14.6, from Nu = 0.16 Ra^0.28 |
+| Expected at this Ra | 13.6, from Nu = 0.138 Ra^0.285 ([Johnston and Doering 2009](https://doi.org/10.1103/PhysRevLett.102.064501)) |
 
 The Poisson solve is verified against a known streamfunction and confirmed
 second-order in z under grid refinement. The full solver reproduces the domain's
 translation and reflection symmetries to 1e-10, gives a divergence-free velocity
-field to the same tolerance, and matches the published heat transport.
+field to the same tolerance, and matches the published heat transport. All of
+these are checked in the test suite.
 
 ## Quickstart
 
