@@ -23,7 +23,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "ruff==0.16.3"]
+dev = ["pytest", "ruff==0.16.9"]
 
 [project.scripts]
 rbcs-simulate = "rbcs.experiments.simulate:main"
